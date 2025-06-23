@@ -1,0 +1,10 @@
+{
+  "projectName": "apialed",
+  "meta": {
+    "type": "backend"
+  },
+  "backend": {
+    "platform": "node17"
+  },
+  "hash": "789fddec"
+}
