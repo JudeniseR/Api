@@ -98,7 +98,7 @@ exports.obtenerProductos = function(producto, respuesta){
 exports.actualizarProducto = function(producto, respuesta){
     conectar();
 
-    const sql = "UPDATE productos SET nombre = ?, descripcion = ?, precioA = ?, categoria = ?, imagen = ? WHERE id = ? ";
+    const sql = "UPDATE productos SET nombre = ?, descripcion = ?, precioArs = ?, categoria = ?, imagen = ? WHERE id = ? ";
     const values = [producto.nombre, producto.descripcion, producto.precioArs, producto.categoria, producto.imagen, producto.id];
 
 
