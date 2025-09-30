@@ -1,98 +1,82 @@
-
-var aplicacion = require('./aplicacion')
+// index.js
+const aplicacion = require('./aplicacion');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+
 const userRoutes = require('./routes/users');
+const reportesRoutes = require('./routes/reportes'); // 👈 router de reportes
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-
-// Configuración del límite de tamaño
+// ---------- Body parsers ----------
 app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-// app.use(cors());
-
-const corsOptions = {
-  origin: 'http://localhost:4200',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200 // <- necesario para algunos navegadores/proxies
-};
-
-app.use(cors(corsOptions));
-
-
-
-
-// Middleware
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.json());
 
-// Rutas
+// ---------- CORS ----------
+const allowList = new Set([
+  'https://j-angular.web.app', // tu frontend en producción
+]);
+
+const corsOptions = {
+  origin: [
+    'https://j-angular.web.app',
+    'http://localhost:4200',
+    'http://localhost:4300',
+    'http://localhost:62763' // <— tu puerto actual
+  ],
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions)); 
+// ---------- Rutas montadas ----------
 app.use('/api/users', userRoutes);
+app.use('/api/reportes', reportesRoutes); // 👈 /api/reportes/*
 
-// Inicio del servidor
-app.listen(PORT, () => {
-  console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
+// ---------- Endpoints legacy (usan módulo "aplicacion") ----------
+app.post('/login/', (req, res) => {
+  const usuario = req.body;
+  aplicacion.loginUsuario(usuario, res);
 });
 
-
-//POST para login de usuarios
-app.post('/login/', (req,res)  => {
-    var usuario = req.body;
-    aplicacion.loginUsuario(usuario, res);
-    console.log(res);
-});
-
-//POST para el registro
 app.post('/registro', (req, res) => {
-
-    var usuario = req.body;
-
-    console.log(req.headers.authorization);
-
-    aplicacion.insertar(usuario, res);
-    
-})
+  const usuario = req.body;
+  aplicacion.insertar(usuario, res);
+});
 
 app.post('/obtener_productos', (req, res) => {
-
-    var producto = req.body;
-
-    aplicacion.obtener_productos(producto, res);
-    
-})
+  const producto = req.body;
+  aplicacion.obtener_productos(producto, res);
+});
 
 app.post('/actualizar_producto', (req, res) => {
-
-    var producto = req.body;
-
-    aplicacion.actualizar_producto(producto, res);
-    
-})
+  const producto = req.body;
+  aplicacion.actualizar_producto(producto, res);
+});
 
 app.post('/crear_producto', (req, res) => {
+  const producto = req.body;
+  aplicacion.crear_producto(producto, res);
+});
 
-    var producto = req.body;
-
-    aplicacion.crear_producto(producto, res);
-    
-})
 app.post('/eliminar_producto', (req, res) => {
-
-    var producto = req.body;
-
-    aplicacion.eliminar_producto(producto, res);
-    
-})
-
+  const producto = req.body;
+  aplicacion.eliminar_producto(producto, res);
+});
 
 app.post('/crear_factura', (req, res) => {
+  const factura = req.body;
+  aplicacion.crear_factura(factura, res);
+});
 
-    var factura = req.body;
+// (opcional) healthcheck
+app.get('/healthz', (_req, res) => res.status(200).send('ok'));
 
-    aplicacion.crear_factura(factura, res);
-    
-})
-
+// ---------- Start ----------
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Servidor backend corriendo en http://0.0.0.0:${PORT}`);
+});

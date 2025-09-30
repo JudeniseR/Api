@@ -135,16 +135,29 @@ exports.eliminarProducto= function(producto, respuesta){
     });
 }
 
-exports.crearFactura= function(factura, respuesta){
-    conectar();
+exports.crearFactura = function (factura, respuesta) {
+  conectar();
 
-    const sql = "INSERT INTO producto_factura(cantidad,precio_unitario,total_ars,total_usd,cotizacion_usd,fecha_cotizacion) VALUES (?, ?, ?, ?, ?, ?)";
-    const values = [factura.cantidad,factura.precio_unitario,factura.total_ars,factura.total_usd,factura.cotizacion_usd,factura.fecha_cotizacion];
+  const sql = "INSERT INTO producto_factura (id_usuario, id_producto, cantidad, precio_unitario, total_ars, total_usd, cotizacion_usd, fecha_cotizacion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  const values = [
+    factura.id_usuario,
+    factura.id_producto,
+    factura.cantidad,
+    factura.precio_unitario,
+    factura.total_ars,
+    factura.total_usd,
+    factura.cotizacion_usd,
+    factura.fecha_cotizacion
+  ];
 
+  conexion.query(sql, values, function (err, resultado) {
+    if (err) throw err;
+    console.log(resultado);
+    respuesta(resultado);
+  });
+};
 
-    conexion.query(sql, values, function (err, resultado) {
-        if(err) throw err;
-        console.log(resultado);
-        respuesta(resultado);
-    });
-}
+exports.query = function (sql, params, cb) {
+  conectar();
+  conexion.query(sql, params, cb);
+};
